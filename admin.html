@@ -181,26 +181,41 @@
                     <td>
                         <a href="${project.source_file_url}" class="btn-download" target="_blank">ZIP</a>
                         <a href="${project.db_file_url}" class="btn-download" target="_blank">SQL</a>
-                        <button class="btn-delete" onclick="deleteProject('${project.id}')">Hapus</button>
+                        <button class="btn-delete" onclick="deleteProject('${project.id}', '${project.source_file_url}', '${project.db_file_url}')">Hapus</button>
                     </td>
                 `;
                 projectsBody.appendChild(tr);
             });
         }
 
-        // DELETE PROJECT
-        async function deleteProject(id) {
-            if (!confirm('Apakah Anda yakin ingin menghapus proyek ini secara permanen?')) return;
+        // DELETE PROJECT (STORAGE + DB)
+        async function deleteProject(id, sourceUrl, dbUrl) {
+            if (!confirm('Apakah Anda yakin ingin menghapus proyek ini secara permanen? Seluruh file dan data akan dihapus!')) return;
 
+            // 1. Delete from Storage
+            try {
+                if (sourceUrl) {
+                    const sourcePath = sourceUrl.split('/project-files/')[1];
+                    if (sourcePath) await supabase.storage.from('project-files').remove([sourcePath]);
+                }
+                if (dbUrl) {
+                    const dbPath = dbUrl.split('/project-files/')[1];
+                    if (dbPath) await supabase.storage.from('project-files').remove([dbPath]);
+                }
+            } catch (err) {
+                console.error('Error hapus storage:', err);
+            }
+
+            // 2. Delete from DB
             const { error } = await supabase
                 .from('projects')
                 .delete()
                 .eq('id', id);
 
             if (error) {
-                alert('Gagal menghapus: ' + error.message);
+                alert('Gagal menghapus data proyek: ' + error.message);
             } else {
-                alert('Proyek berhasil dihapus.');
+                alert('Proyek beserta semua filenya berhasil dihapus.');
                 loadAllProjects();
             }
         }

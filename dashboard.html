@@ -89,6 +89,9 @@
         .project-info p { margin: 0; font-size: 0.85rem; color: var(--ink-2); }
         .project-files { font-size: 0.8rem; color: var(--accent); font-weight: 600; }
         .project-files a { color: var(--accent); text-decoration: none; margin-left: 10px; border-bottom: 1px solid; }
+        
+        .btn-delete { background: #fee2e2; color: #b91c1c; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.8rem; margin-left: 10px; }
+        .btn-delete:hover { background: #fecaca; }
 
         .loading { text-align: center; padding: 20px; font-style: italic; color: var(--ink-3); }
     </style>
@@ -217,6 +220,7 @@
                     <div class="project-files">
                         <a href="${project.source_file_url}" target="_blank">Source ZIP</a>
                         <a href="${project.db_file_url}" target="_blank">Database SQL</a>
+                        <button class="btn-delete" onclick="deleteProject('${project.id}', '${project.source_file_url}', '${project.db_file_url}')">Hapus Proyek</button>
                     </div>
                 `;
                 projectsContainer.appendChild(card);
@@ -283,6 +287,38 @@
                 submitBtn.innerText = 'Simpan Proyek';
             }
         });
+
+        // DELETE PROJECT (User)
+        async function deleteProject(id, sourceUrl, dbUrl) {
+            if (!confirm('Apakah Anda yakin ingin menghapus proyek ini? File dan data proyek akan dihapus permanen.')) return;
+
+            // 1. Delete from Storage
+            try {
+                if (sourceUrl) {
+                    const sourcePath = sourceUrl.split('/project-files/')[1];
+                    if (sourcePath) await supabase.storage.from('project-files').remove([sourcePath]);
+                }
+                if (dbUrl) {
+                    const dbPath = dbUrl.split('/project-files/')[1];
+                    if (dbPath) await supabase.storage.from('project-files').remove([dbPath]);
+                }
+            } catch (err) {
+                console.error('Error hapus storage:', err);
+            }
+
+            // 2. Delete from DB
+            const { error } = await supabase
+                .from('projects')
+                .delete()
+                .eq('id', id);
+
+            if (error) {
+                alert('Gagal menghapus proyek: ' + error.message);
+            } else {
+                alert('Proyek berhasil dihapus.');
+                loadProjects();
+            }
+        }
     </script>
 </body>
 </html>
