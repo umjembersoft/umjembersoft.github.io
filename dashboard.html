@@ -96,6 +96,7 @@
     <nav class="nav">
         <div class="nav-brand">UMJemberSoft</div>
         <div class="nav-user">
+            <a id="adminLink" href="admin.html" style="display:none; margin-right: 20px; font-weight: 700; color: var(--accent); text-decoration: none;">Panel Admin</a>
             <span id="userNameDisplay">Halo, Mahasiswa!</span>
             <a id="logoutBtn" class="btn-logout">Logout</a>
         </div>
@@ -159,6 +160,12 @@
             }
             currentUser = session.user;
             userNameDisplay.innerText = `Halo, ${currentUser.user_metadata.full_name || 'Mahasiswa'}!`;
+            
+            // Check for admin role
+            if (currentUser.user_metadata.role === 'admin' || currentUser.email === 'admin@umjember.ac.id') {
+                document.getElementById('adminLink').style.display = 'inline';
+            }
+
             loadProjects();
         }
         checkUser();
