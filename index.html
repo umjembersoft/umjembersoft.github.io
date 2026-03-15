@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UMJemberSoft — Portal Akademik Mahasiswa</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     /* ============================================================
        CSS VARIABLES & RESET
@@ -1341,6 +1342,25 @@
         if (a.getAttribute('href') === '#' + current) a.classList.add('active');
       });
     });
+
+    // Supabase Session Check for Landing Page
+    async function checkLandingSession() {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+            const loginBtns = document.querySelectorAll('.nav-cta, .mobile-cta');
+            loginBtns.forEach(btn => {
+                if (btn.tagName === 'BUTTON') {
+                    btn.innerHTML = '<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg> Dashboard';
+                    btn.onclick = () => window.location.href = 'dashboard.html';
+                } else {
+                    btn.innerText = 'Dashboard Mahasiswa';
+                    btn.href = 'dashboard.html';
+                }
+            });
+        }
+    }
   </script>
+  <script src="supabase-client.js"></script>
+  <script>checkLandingSession();</script>
 </body>
 </html>

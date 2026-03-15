@@ -23,6 +23,7 @@
             color: var(--ink);
             margin: 0;
             padding: 0;
+            display: none; /* Hide until auth check */
         }
         .nav {
             background: var(--surface);
@@ -158,12 +159,17 @@
                 window.location.href = 'login.html';
                 return;
             }
+            
+            // Show body after successful session check
+            document.body.style.display = 'block';
+            
             currentUser = session.user;
             userNameDisplay.innerText = `Halo, ${currentUser.user_metadata.full_name || 'Mahasiswa'}!`;
             
             // Check for admin role
             if (currentUser.user_metadata.role === 'admin' || currentUser.email === 'admin@umjember.ac.id') {
                 document.getElementById('adminLink').style.display = 'inline';
+                userNameDisplay.innerText += ' (Admin)';
             }
 
             loadProjects();

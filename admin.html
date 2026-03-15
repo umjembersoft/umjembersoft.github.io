@@ -23,6 +23,7 @@
             color: var(--ink);
             margin: 0;
             padding: 0;
+            display: none; /* Hide until auth check */
         }
         .nav {
             background: var(--surface);
@@ -126,6 +127,9 @@
                 window.location.href = 'dashboard.html';
                 return;
             }
+
+            // Show body after successful admin check
+            document.body.style.display = 'block';
 
             loadAllProjects();
         }
